@@ -40,29 +40,55 @@ public extension NotificationBannerController {
 
     let notificationView = NotificationBannerView(title: title, text: text, image: image)
     notificationView.translatesAutoresizingMaskIntoConstraints = false
+    notificationView.userInteractionEnabled = true
     sharedInstance.view.addSubview(notificationView)
 
     notificationView.heightAnchor.constraintEqualToConstant(height).active = true
-    sharedInstance.view.leadingAnchor.constraintEqualToAnchor(notificationView.leadingAnchor).active = true
-    sharedInstance.view.trailingAnchor.constraintEqualToAnchor(notificationView.trailingAnchor).active = true
+    notificationView.leadingConstraint?.active = true
+    notificationView.trailingConstraint?.active = true
+    notificationView.initialBottomConstraint?.active = true
+    notificationView.finalBottomConstraint?.active = false
+    notificationView.layoutIfNeeded()
 
-    let bottom1 = notificationView.bottomAnchor.constraintEqualToAnchor(sharedInstance.view.topAnchor)
-    bottom1.active = true
-    let bottom2 = notificationView.bottomAnchor.constraintEqualToAnchor(sharedInstance.view.bottomAnchor)
-    bottom2.active = false
+    UIView.animateWithDuration(0.2, delay: 0, options: .AllowUserInteraction, animations: {
+      notificationView.initialBottomConstraint?.active = false
+      notificationView.finalBottomConstraint?.active = true
+      notificationView.setNeedsLayout()
+      notificationView.layoutIfNeeded()
+    }, completion: { finished in
+      let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(7 * Double(NSEC_PER_SEC)))
+      dispatch_after(delayTime, dispatch_get_main_queue()) { [weak notificationView] in
+        UIView.animateWithDuration(0.2, delay: 0, options: [.AllowAnimatedContent, .AllowUserInteraction], animations: {
+          notificationView?.finalBottomConstraint?.active = false
+          notificationView?.initialBottomConstraint?.active = true
+          notificationView?.setNeedsLayout()
+          notificationView?.layoutIfNeeded()
+        }, completion: { finished in
+          notificationView?.removeFromSuperview()
+        })
+      }
+    })
+
+    let swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(didRecognizeSwipeGesture(_:)))
+    swipeGestureRecognizer.direction = .Up
+    notificationView.addGestureRecognizer(swipeGestureRecognizer)
+  }
+
+  @objc
+  public static func didRecognizeSwipeGesture(sender: UISwipeGestureRecognizer) {
+    guard sender.state == .Ended else {
+      return
+    }
+
+    guard let notificationView = sender.view as? NotificationBannerView else {
+      return
+    }
 
     notificationView.layoutIfNeeded()
 
     UIView.animateWithDuration(0.2, delay: 0, options: .AllowUserInteraction, animations: {
-      bottom1.active = false
-      bottom2.active = true
-      notificationView.setNeedsLayout()
-      notificationView.layoutIfNeeded()
-    }, completion: nil)
-
-    UIView.animateWithDuration(0.2, delay: 7, options: .AllowUserInteraction, animations: { 
-      bottom1.active = true
-      bottom2.active = false
+      notificationView.finalBottomConstraint?.active = false
+      notificationView.initialBottomConstraint?.active = true
       notificationView.setNeedsLayout()
       notificationView.layoutIfNeeded()
     }, completion: { finished in

@@ -70,19 +70,85 @@ public class NotificationBannerView: UIView {
     let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Dark)
     let blurView = UIVisualEffectView(effect: blurEffect)
     blurView.translatesAutoresizingMaskIntoConstraints = false
-
-    let vibrancyEffect = UIVibrancyEffect(forBlurEffect: blurEffect)
-    let vibrancyView = UIVisualEffectView(effect: vibrancyEffect)
-    vibrancyView.translatesAutoresizingMaskIntoConstraints = false
-
-    blurView.addSubview(vibrancyView)
-    blurView.leadingAnchor.constraintEqualToAnchor(vibrancyView.leadingAnchor).active = true
-    blurView.trailingAnchor.constraintEqualToAnchor(vibrancyView.trailingAnchor).active = true
-    blurView.topAnchor.constraintEqualToAnchor(vibrancyView.topAnchor).active = true
-    blurView.bottomAnchor.constraintEqualToAnchor(vibrancyView.bottomAnchor).active = true
-
     return blurView
   }()
+
+  private lazy var _initialBottomConstraint: NSLayoutConstraint? = {
+    return self.bottomAnchor.constraintEqualToAnchor(self.superview!.topAnchor)
+  }()
+
+  var initialBottomConstraint: NSLayoutConstraint? {
+    guard let _ = superview else {
+      return nil
+    }
+
+    return _initialBottomConstraint
+  }
+
+  private lazy var _finalBottomConstraint: NSLayoutConstraint? = {
+    return self.bottomAnchor.constraintEqualToAnchor(self.superview!.bottomAnchor)
+  }()
+
+  var finalBottomConstraint: NSLayoutConstraint? {
+    guard let _ = superview else {
+      return nil
+    }
+
+    return _finalBottomConstraint
+  }
+
+  private lazy var _leadingConstraint: NSLayoutConstraint? = {
+    return self.superview!.leadingAnchor.constraintEqualToAnchor(self.leadingAnchor)
+  }()
+
+  var leadingConstraint: NSLayoutConstraint? {
+    guard let _ = superview else {
+      return nil
+    }
+
+    return _leadingConstraint
+  }
+
+  private lazy var _trailingConstraint: NSLayoutConstraint? = {
+    return self.trailingAnchor.constraintEqualToAnchor(self.superview!.trailingAnchor)
+  }()
+
+  var trailingConstraint: NSLayoutConstraint? {
+    guard let _ = superview else {
+      return nil
+    }
+
+    return _trailingConstraint
+  }
+
+}
+
+// MARK: Internal methods
+
+extension NotificationBannerView {
+
+  @objc
+  func didRecognizeSwipeGesture(sender: UISwipeGestureRecognizer) {
+    guard sender.state == .Ended else {
+      return
+    }
+
+    guard let notificationView = sender.view else {
+      return
+    }
+
+    let bottom1 = notificationView.constraints.filter { $0.identifier == "bottom1" }.first
+    let bottom2 = notificationView.constraints.filter { $0.identifier == "bottom2" }.first
+
+    UIView.animateWithDuration(0.2, delay: 0, options: .AllowUserInteraction, animations: {
+      bottom1?.active = true
+      bottom2?.active = false
+      notificationView.setNeedsLayout()
+      notificationView.layoutIfNeeded()
+      }, completion: { finished in
+        notificationView.removeFromSuperview()
+    })
+  }
 
 }
 
@@ -92,6 +158,7 @@ private extension NotificationBannerView {
 
   private func initialize() {
     addSubview(effectView)
+    effectView.userInteractionEnabled = true
     effectView.layoutMargins = UIEdgeInsets(top: 8, left: 15, bottom: 8, right: 15)
     leadingAnchor.constraintEqualToAnchor(effectView.leadingAnchor).active = true
     trailingAnchor.constraintEqualToAnchor(effectView.trailingAnchor).active = true
@@ -110,7 +177,7 @@ private extension NotificationBannerView {
     stackView.distribution = .Fill
     stackView.spacing = 11
     stackView.translatesAutoresizingMaskIntoConstraints = false
-    addSubview(stackView)
+    effectView.addSubview(stackView)
 
     effectView.layoutMarginsGuide.leadingAnchor.constraintEqualToAnchor(stackView.leadingAnchor).active = true
     stackView.trailingAnchor.constraintEqualToAnchor(effectView.layoutMarginsGuide.trailingAnchor).active = true
@@ -120,6 +187,18 @@ private extension NotificationBannerView {
     imageView.image = image
     titleLabel.text = title
     textLabel.text = text
+
+    let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didRecognizeSwipeGesture(_:)))
+    tapGestureRecognizer.delegate = self
+    addGestureRecognizer(tapGestureRecognizer)
+  }
+
+}
+
+extension NotificationBannerView: UIGestureRecognizerDelegate {
+
+  public func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+    return true
   }
 
 }
