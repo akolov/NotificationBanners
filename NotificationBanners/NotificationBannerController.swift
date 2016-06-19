@@ -19,6 +19,10 @@ public class NotificationBannerController: UIViewController {
     // Dispose of any resources that can be recreated.
   }
 
+  public override func prefersStatusBarHidden() -> Bool {
+    return false
+  }
+
   public private(set) static var window: UIWindow?
   public static let sharedInstance = NotificationBannerController()
 
