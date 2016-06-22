@@ -20,7 +20,25 @@ public class NotificationBannerController: UIViewController {
   }
 
   public override func prefersStatusBarHidden() -> Bool {
-    return false
+    return statusBarHidden
+  }
+
+  public override func preferredStatusBarStyle() -> UIStatusBarStyle {
+    return statusBarStyle
+  }
+
+  // MARK: Properties
+
+  public var statusBarHidden = false {
+    didSet {
+      setNeedsStatusBarAppearanceUpdate()
+    }
+  }
+
+  public var statusBarStyle: UIStatusBarStyle = .Default {
+    didSet {
+      setNeedsStatusBarAppearanceUpdate()
+    }
   }
 
   public private(set) static var window: UIWindow?
