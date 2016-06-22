@@ -24,7 +24,9 @@ class ViewController: UIViewController {
   // MARK: Actions
 
   @IBAction func didTapNotifyButton(sender: UIButton) {
-    NotificationBannerController.showNotification("Boxcar", text: "This is a test message x123 x123 x123 abc abc 45678 ---- abcdefgh ----- xxx *** $$$$ 123 more more more text text text", image: UIImage())
+    NotificationBannerController.showNotification("Boxcar", text: "This is a test message x123 x123 x123 abc abc 45678 ---- abcdefgh ----- xxx *** $$$$ 123 more more more text text text", image: UIImage()) {
+      print("Tapped notfication banner")
+    }
   }
 
 }

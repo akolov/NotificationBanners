@@ -37,6 +37,7 @@ public class NotificationBannerView: UIView {
   private var title: String
   private var text: String?
   private var image: UIImage?
+  var action: (() -> Void)?
 
   private lazy var titleLabel: UILabel = {
     let label = UILabel()
@@ -128,26 +129,30 @@ public class NotificationBannerView: UIView {
 extension NotificationBannerView {
 
   @objc
-  func didRecognizeSwipeGesture(sender: UISwipeGestureRecognizer) {
+  func didRecognizeTapGesture(sender: UITapGestureRecognizer) {
     guard sender.state == .Ended else {
       return
     }
 
-    guard let notificationView = sender.view else {
-      return
-    }
+    action?()
+    dismiss(animated: true)
+  }
 
-    let bottom1 = notificationView.constraints.filter { $0.identifier == "bottom1" }.first
-    let bottom2 = notificationView.constraints.filter { $0.identifier == "bottom2" }.first
-
-    UIView.animateWithDuration(0.2, delay: 0, options: .AllowUserInteraction, animations: {
-      bottom1?.active = true
-      bottom2?.active = false
-      notificationView.setNeedsLayout()
-      notificationView.layoutIfNeeded()
+  func dismiss(animated animated: Bool) {
+    if animated {
+      layoutIfNeeded()
+      UIView.animateWithDuration(0.2, delay: 0, options: .AllowUserInteraction, animations: {
+        self.finalBottomConstraint?.active = false
+        self.initialBottomConstraint?.active = true
+        self.setNeedsLayout()
+        self.layoutIfNeeded()
       }, completion: { finished in
-        notificationView.removeFromSuperview()
-    })
+        self.removeFromSuperview()
+      })
+    }
+    else {
+      removeFromSuperview()
+    }
   }
 
 }
@@ -188,17 +193,8 @@ private extension NotificationBannerView {
     titleLabel.text = title
     textLabel.text = text
 
-    let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didRecognizeSwipeGesture(_:)))
-    tapGestureRecognizer.delegate = self
+    let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didRecognizeTapGesture(_:)))
     addGestureRecognizer(tapGestureRecognizer)
-  }
-
-}
-
-extension NotificationBannerView: UIGestureRecognizerDelegate {
-
-  public func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
-    return true
   }
 
 }

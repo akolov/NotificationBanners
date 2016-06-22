@@ -48,7 +48,7 @@ public class NotificationBannerController: UIViewController {
 
 public extension NotificationBannerController {
 
-  public static func showNotification(title: String, text: String, image: UIImage) {
+  public static func showNotification(title: String, text: String, image: UIImage, action: (() -> Void)? = nil) {
     let height = notificationHeight
 
     if window == nil {
@@ -61,6 +61,7 @@ public extension NotificationBannerController {
     window?.makeKeyAndVisible()
 
     let notificationView = NotificationBannerView(title: title, text: text, image: image)
+    notificationView.action = action
     notificationView.translatesAutoresizingMaskIntoConstraints = false
     notificationView.userInteractionEnabled = true
     sharedInstance.view.addSubview(notificationView)
@@ -80,14 +81,7 @@ public extension NotificationBannerController {
     }, completion: { finished in
       let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(7 * Double(NSEC_PER_SEC)))
       dispatch_after(delayTime, dispatch_get_main_queue()) { [weak notificationView] in
-        UIView.animateWithDuration(0.2, delay: 0, options: [.AllowAnimatedContent, .AllowUserInteraction], animations: {
-          notificationView?.finalBottomConstraint?.active = false
-          notificationView?.initialBottomConstraint?.active = true
-          notificationView?.setNeedsLayout()
-          notificationView?.layoutIfNeeded()
-        }, completion: { finished in
-          notificationView?.removeFromSuperview()
-        })
+        notificationView?.dismiss(animated: true)
       }
     })
 
@@ -106,16 +100,7 @@ public extension NotificationBannerController {
       return
     }
 
-    notificationView.layoutIfNeeded()
-
-    UIView.animateWithDuration(0.2, delay: 0, options: .AllowUserInteraction, animations: {
-      notificationView.finalBottomConstraint?.active = false
-      notificationView.initialBottomConstraint?.active = true
-      notificationView.setNeedsLayout()
-      notificationView.layoutIfNeeded()
-    }, completion: { finished in
-      notificationView.removeFromSuperview()
-    })
+    notificationView.dismiss(animated: true)
   }
 
   private static var notificationHeight: CGFloat {
