@@ -10,10 +10,6 @@ import UIKit
 
 public class NotificationBannerController: UIViewController {
 
-  public override func viewDidLoad() {
-    super.viewDidLoad()
-  }
-
   public override func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
     // Dispose of any resources that can be recreated.
@@ -62,6 +58,7 @@ public extension NotificationBannerController {
 
     let notificationView = NotificationBannerView(title: title, text: text, image: image)
     notificationView.action = action
+    notificationView.delegate = sharedInstance
     notificationView.translatesAutoresizingMaskIntoConstraints = false
     notificationView.userInteractionEnabled = true
     sharedInstance.view.addSubview(notificationView)
@@ -105,6 +102,17 @@ public extension NotificationBannerController {
 
   private static var notificationHeight: CGFloat {
     return UIApplication.sharedApplication().windows.first?.traitCollection.verticalSizeClass == .Compact ? 44 : 64
+  }
+
+}
+
+extension NotificationBannerController: NotificationBannerViewDelegate {
+
+  func notificationBannerViewWasRemovedFromSuperview(view: NotificationBannerView) {
+    if NotificationBannerController.sharedInstance.view.subviews.count == 0 {
+      NotificationBannerController.window?.hidden = true
+      NotificationBannerController.window = nil
+    }
   }
 
 }

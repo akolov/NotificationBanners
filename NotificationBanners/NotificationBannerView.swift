@@ -8,9 +8,9 @@
 
 import UIKit
 
-public class NotificationBannerView: UIView {
+final class NotificationBannerView: UIView {
 
-  public init(title: String, text: String, image: UIImage?) {
+  init(title: String, text: String, image: UIImage?) {
     self.title = title
     self.text = text
     self.image = image
@@ -18,18 +18,25 @@ public class NotificationBannerView: UIView {
     initialize()
   }
 
-  public override init(frame: CGRect) {
+  override init(frame: CGRect) {
     title = ""
     text = ""
     super.init(frame: frame)
     initialize()
   }
   
-  public required init?(coder aDecoder: NSCoder) {
+  required init?(coder aDecoder: NSCoder) {
     title = ""
     text = ""
     super.init(coder: aDecoder)
     initialize()
+  }
+
+  override func didMoveToSuperview() {
+    super.didMoveToSuperview()
+    if superview == nil {
+      delegate?.notificationBannerViewWasRemovedFromSuperview(self)
+    }
   }
 
   // MARK: Properties
@@ -38,6 +45,7 @@ public class NotificationBannerView: UIView {
   private var text: String?
   private var image: UIImage?
   var action: (() -> Void)?
+  weak var delegate: NotificationBannerViewDelegate?
 
   private lazy var titleLabel: UILabel = {
     let label = UILabel()
@@ -196,5 +204,11 @@ private extension NotificationBannerView {
     let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didRecognizeTapGesture(_:)))
     addGestureRecognizer(tapGestureRecognizer)
   }
+
+}
+
+protocol NotificationBannerViewDelegate: class {
+
+  func notificationBannerViewWasRemovedFromSuperview(view: NotificationBannerView)
 
 }
