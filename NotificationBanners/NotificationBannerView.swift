@@ -41,49 +41,49 @@ final class NotificationBannerView: UIView {
 
   // MARK: Properties
 
-  private var title: String
-  private var text: String?
-  private var image: UIImage?
+  fileprivate var title: String
+  fileprivate var text: String?
+  fileprivate var image: UIImage?
   var action: (() -> Void)?
   weak var delegate: NotificationBannerViewDelegate?
 
-  private lazy var titleLabel: UILabel = {
+  fileprivate lazy var titleLabel: UILabel = {
     let label = UILabel()
-    label.font = UIFont.boldSystemFontOfSize(13)
-    label.textColor = UIColor.whiteColor()
+    label.font = UIFont.boldSystemFont(ofSize: 13)
+    label.textColor = UIColor.white
     label.translatesAutoresizingMaskIntoConstraints = false
     return label
   }()
 
-  private lazy var textLabel: UILabel = {
+  fileprivate lazy var textLabel: UILabel = {
     let label = UILabel()
-    label.font = UIFont.systemFontOfSize(13)
-    label.lineBreakMode = .ByTruncatingTail
+    label.font = UIFont.systemFont(ofSize: 13)
+    label.lineBreakMode = .byTruncatingTail
     label.numberOfLines = 2
-    label.textColor = UIColor.whiteColor()
+    label.textColor = UIColor.white
     label.translatesAutoresizingMaskIntoConstraints = false
     return label
   }()
 
-  private lazy var imageView: UIImageView = {
+  fileprivate lazy var imageView: UIImageView = {
     let imageView = UIImageView()
-    imageView.contentMode = .ScaleAspectFit
+    imageView.contentMode = .scaleAspectFit
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.widthAnchor.constraintEqualToConstant(20).active = true
-    imageView.heightAnchor.constraintEqualToConstant(20).active = true
-    imageView.backgroundColor = UIColor.redColor()
+    imageView.widthAnchor.constraint(equalToConstant: 20).isActive = true
+    imageView.heightAnchor.constraint(equalToConstant: 20).isActive = true
+    imageView.backgroundColor = UIColor.red
     return imageView
   }()
 
-  private lazy var effectView: UIVisualEffectView = {
-    let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Dark)
+  fileprivate lazy var effectView: UIVisualEffectView = {
+    let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.dark)
     let blurView = UIVisualEffectView(effect: blurEffect)
     blurView.translatesAutoresizingMaskIntoConstraints = false
     return blurView
   }()
 
-  private lazy var _initialBottomConstraint: NSLayoutConstraint? = {
-    return self.bottomAnchor.constraintEqualToAnchor(self.superview!.topAnchor)
+  fileprivate lazy var _initialBottomConstraint: NSLayoutConstraint? = {
+    return self.bottomAnchor.constraint(equalTo: self.superview!.topAnchor)
   }()
 
   var initialBottomConstraint: NSLayoutConstraint? {
@@ -94,8 +94,8 @@ final class NotificationBannerView: UIView {
     return _initialBottomConstraint
   }
 
-  private lazy var _finalBottomConstraint: NSLayoutConstraint? = {
-    return self.bottomAnchor.constraintEqualToAnchor(self.superview!.bottomAnchor)
+  fileprivate lazy var _finalBottomConstraint: NSLayoutConstraint? = {
+    return self.bottomAnchor.constraint(equalTo: self.superview!.bottomAnchor)
   }()
 
   var finalBottomConstraint: NSLayoutConstraint? {
@@ -106,8 +106,8 @@ final class NotificationBannerView: UIView {
     return _finalBottomConstraint
   }
 
-  private lazy var _leadingConstraint: NSLayoutConstraint? = {
-    return self.superview!.leadingAnchor.constraintEqualToAnchor(self.leadingAnchor)
+  fileprivate lazy var _leadingConstraint: NSLayoutConstraint? = {
+    return self.superview!.leadingAnchor.constraint(equalTo: self.leadingAnchor)
   }()
 
   var leadingConstraint: NSLayoutConstraint? {
@@ -118,8 +118,8 @@ final class NotificationBannerView: UIView {
     return _leadingConstraint
   }
 
-  private lazy var _trailingConstraint: NSLayoutConstraint? = {
-    return self.trailingAnchor.constraintEqualToAnchor(self.superview!.trailingAnchor)
+  fileprivate lazy var _trailingConstraint: NSLayoutConstraint? = {
+    return self.trailingAnchor.constraint(equalTo: self.superview!.trailingAnchor)
   }()
 
   var trailingConstraint: NSLayoutConstraint? {
@@ -137,8 +137,8 @@ final class NotificationBannerView: UIView {
 extension NotificationBannerView {
 
   @objc
-  func didRecognizeTapGesture(sender: UITapGestureRecognizer) {
-    guard sender.state == .Ended else {
+  func didRecognizeTapGesture(_ sender: UITapGestureRecognizer) {
+    guard sender.state == .ended else {
       return
     }
 
@@ -146,12 +146,12 @@ extension NotificationBannerView {
     dismiss(animated: true)
   }
 
-  func dismiss(animated animated: Bool) {
+  func dismiss(animated: Bool) {
     if animated {
       layoutIfNeeded()
-      UIView.animateWithDuration(0.2, delay: 0, options: .AllowUserInteraction, animations: {
-        self.finalBottomConstraint?.active = false
-        self.initialBottomConstraint?.active = true
+      UIView.animate(withDuration: 0.2, delay: 0, options: .allowUserInteraction, animations: {
+        self.finalBottomConstraint?.isActive = false
+        self.initialBottomConstraint?.isActive = true
         self.setNeedsLayout()
         self.layoutIfNeeded()
       }, completion: { finished in
@@ -169,33 +169,33 @@ extension NotificationBannerView {
 
 private extension NotificationBannerView {
 
-  private func initialize() {
+  func initialize() {
     addSubview(effectView)
-    effectView.userInteractionEnabled = true
+    effectView.isUserInteractionEnabled = true
     effectView.layoutMargins = UIEdgeInsets(top: 8, left: 15, bottom: 8, right: 15)
-    leadingAnchor.constraintEqualToAnchor(effectView.leadingAnchor).active = true
-    trailingAnchor.constraintEqualToAnchor(effectView.trailingAnchor).active = true
-    topAnchor.constraintEqualToAnchor(effectView.topAnchor).active = true
-    bottomAnchor.constraintEqualToAnchor(effectView.bottomAnchor).active = true
+    leadingAnchor.constraint(equalTo: effectView.leadingAnchor).isActive = true
+    trailingAnchor.constraint(equalTo: effectView.trailingAnchor).isActive = true
+    topAnchor.constraint(equalTo: effectView.topAnchor).isActive = true
+    bottomAnchor.constraint(equalTo: effectView.bottomAnchor).isActive = true
 
     let labelsStackView = UIStackView(arrangedSubviews: [titleLabel, textLabel])
-    labelsStackView.axis = .Vertical
-    labelsStackView.alignment = .Leading
-    labelsStackView.distribution = .Fill
+    labelsStackView.axis = .vertical
+    labelsStackView.alignment = .leading
+    labelsStackView.distribution = .fill
     labelsStackView.translatesAutoresizingMaskIntoConstraints = false
 
     let stackView = UIStackView(arrangedSubviews: [imageView, labelsStackView])
-    stackView.axis = .Horizontal
-    stackView.alignment = .Leading
-    stackView.distribution = .Fill
+    stackView.axis = .horizontal
+    stackView.alignment = .leading
+    stackView.distribution = .fill
     stackView.spacing = 11
     stackView.translatesAutoresizingMaskIntoConstraints = false
     effectView.addSubview(stackView)
 
-    effectView.layoutMarginsGuide.leadingAnchor.constraintEqualToAnchor(stackView.leadingAnchor).active = true
-    stackView.trailingAnchor.constraintEqualToAnchor(effectView.layoutMarginsGuide.trailingAnchor).active = true
-    effectView.layoutMarginsGuide.topAnchor.constraintEqualToAnchor(stackView.topAnchor).active = true
-    stackView.bottomAnchor.constraintEqualToAnchor(effectView.layoutMarginsGuide.bottomAnchor).active = true
+    effectView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+    stackView.trailingAnchor.constraint(equalTo: effectView.layoutMarginsGuide.trailingAnchor).isActive = true
+    effectView.layoutMarginsGuide.topAnchor.constraint(equalTo: stackView.topAnchor).isActive = true
+    stackView.bottomAnchor.constraint(equalTo: effectView.layoutMarginsGuide.bottomAnchor).isActive = true
 
     imageView.image = image
     titleLabel.text = title
@@ -209,6 +209,6 @@ private extension NotificationBannerView {
 
 protocol NotificationBannerViewDelegate: class {
 
-  func notificationBannerViewWasRemovedFromSuperview(view: NotificationBannerView)
+  func notificationBannerViewWasRemovedFromSuperview(_ view: NotificationBannerView)
 
 }
