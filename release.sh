@@ -7,7 +7,6 @@ export GITHUB_REPO=NotificationBanners
 export GITHUB_TOKEN=$(cat ~/.github_token)
 
 PRODUCT_NAME=NotificationBanners
-UPLOAD_NAME=NotificationBanners
 TAG=$1
 
 carthage build --no-skip-current
